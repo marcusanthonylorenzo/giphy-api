@@ -8,15 +8,32 @@ $("#search").click(function () {
   let request = new XMLHttpRequest();
   let url = `https://api.giphy.com/v1/gifs/search?api_key=${process.env.API_KEY}&q=${input}`;
 
+  $("#image-block").text("");
+  $("#input").text("");
+
+  request.onreadystatechange = function () {
+    if (this.readyState === 4 && this.status === 200) {
+      const response = JSON.parse(this.responseText);
+      buildImgs(response.data);
+    }
+  };
+
+  request.open("GET", url, true);
+
+  request.send();
+});
+
+$("#trending").click(function () {
+
+  let request = new XMLHttpRequest();
+  let url = `https://api.giphy.com/v1/gifs/trending?api_key=${process.env.API_KEY}`;
+  $("#image-block").text("");
+
   request.onreadystatechange = function () {
     if (this.readyState === 4 && this.status === 200) {
       const response = JSON.parse(this.responseText);
       console.log(response);
-      let imgUrl = response.data[0].images.original.url;
-      console.log(imgUrl);
       buildImgs(response.data);
-      
-
     }
   };
 
