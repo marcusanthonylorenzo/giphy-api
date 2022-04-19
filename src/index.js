@@ -1,45 +1,35 @@
 import $ from 'jquery';
 import "./css/styles.css";
+import GifGenerator from './js/apiLogic.js';
 
 //process.env.API_KEY
 $("#search").click(function () {
-
+  //get input, clear input
   let input = $("#input").val();
-  let request = new XMLHttpRequest();
-  let url = `https://api.giphy.com/v1/gifs/search?api_key=${process.env.API_KEY}&q=${input}`;
-
   $("#image-block").text("");
   $("#input").text("");
 
-  request.onreadystatechange = function () {
-    if (this.readyState === 4 && this.status === 200) {
-      const response = JSON.parse(this.responseText);
-      buildImgs(response.data);
-    }
-  };
-
-  request.open("GET", url, true);
-
-  request.send();
+  //create promise from new Promise object.
+  let promise = GifGenerator.getGifs(input);
+  //promise.then (if response is successful, .then doSometing().)
+  promise.then(function(response) {
+    const parsedResponse = JSON.parse(response);
+    console.log(parsedResponse, parsedResponse.data);
+    buildImgs(parsedResponse.data);
+    console.log("success!");
+  });
 });
 
 $("#trending").click(function () {
 
-  let request = new XMLHttpRequest();
-  let url = `https://api.giphy.com/v1/gifs/trending?api_key=${process.env.API_KEY}`;
   $("#image-block").text("");
-
-  request.onreadystatechange = function () {
-    if (this.readyState === 4 && this.status === 200) {
-      const response = JSON.parse(this.responseText);
-      console.log(response);
-      buildImgs(response.data);
-    }
-  };
-
-  request.open("GET", url, true);
-
-  request.send();
+  //create promise, different static method.
+  let promise = new GifGenerator.getTrending();
+  promise.then((response) => {
+    const parsedResponse = JSON.parse(response);
+    buildImgs(parsedResponse.data);
+    console.log("Now Trending.");
+  });
 });
 
 function buildImgs(data) {
